@@ -27,6 +27,14 @@ class Parser
    */
   const NS = "\\Riml\\";
 
+  /**
+   * Properties allowed in root document, and Route documents.
+   */
+  const COMMON_PROPS = 
+  [
+    'title', 'description', 'controller', 'method', 'apiType', 'authType',
+  ];
+
   public $method_prefix = 'handle_';
   public $confdir;
 

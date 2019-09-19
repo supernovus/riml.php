@@ -134,7 +134,7 @@ class Route
     $this->root       = $parent->root;
     $this->route_name = $rname;
 
-    foreach ([self::COMMON_PROPS, self::ROUTE_PROPS] as $psrc)
+    foreach ([Parser::COMMON_PROPS, self::ROUTE_PROPS] as $psrc)
     {
       foreach ($psrc as $pname)
       {

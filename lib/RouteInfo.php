@@ -10,14 +10,6 @@ trait RouteInfo
   use RimlBase;
 
   /**
-   * Properties allowed in root document, and Route documents.
-   */
-  const COMMON_PROPS = 
-  [
-    'title', 'description', 'controller', 'method', 'apiType', 'authType',
-  ];
-
-  /**
    * Controller name.
    */
   public $controller;
