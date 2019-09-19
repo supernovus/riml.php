@@ -1,0 +1,27 @@
+{
+  "name": "riml/riml-parser",
+  "type": "library",
+  "description": "A RIML parser for PHP",
+  "homepage": "https://github.com/supernovus/riml.php",
+  "license": "MIT",
+  "authors":
+  [
+    {
+      "name": "Timothy Totten",
+      "email": "supernovus@gmail.com",
+      "role": "Original Author"
+    }
+  ],
+  "require":
+  {
+    "php": "^5.6 || ^7.0",
+    "ext-yaml": "*"
+  },
+  "autoload":
+  {
+    "psr-4": 
+    {
+      "Riml\\": "lib"
+    }
+  }
+}
