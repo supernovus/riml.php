@@ -20,7 +20,7 @@ class Parser
   /**
    * The RIML version.
    */
-  const VERSION = '1.0-DRAFT-10';
+  const VERSION = '1.0-DRAFT-11';
 
   /**
    * The namespace RIML child classes are defined in.
@@ -99,28 +99,29 @@ class Parser
 #    error_log("RIML::loadFile($filename)");
     if (file_exists($filename))
     {
+      $confdir = dirname($filename);
       if (!isset($this->confdir))
       {
-        $this->confdir = dirname($filename);
+        $this->confdir = $confdir;
       }
       $text = file_get_contents($filename);
-      return $this->loadText($text);
+      return $this->loadText($text, $confdir);
     }
     throw new \Exception("Invalid filename '$filename' passed to RIML::loadFile()");
   }
 
-  protected function loadText ($text)
+  protected function loadText ($text, $confdir=null)
   {
     $self = $this;
     return yaml_parse($text, 0, $ndocs,
     [
-      '!include' => function ($value, $tag, $flags) use ($self)
+      '!include' => function ($value, $tag, $flags) use ($self, $confdir)
       {
-        return $self->includeFile($value, true);
+        return $self->includeFile($value, $confdir, true);
       },
-      '!includePath' => function ($value, $tag, $flags) use ($self)
+      '!includePath' => function ($value, $tag, $flags) use ($self, $confdir)
       {
-        return $self->includeFile($value, false);
+        return $self->includeFile($value, $confdir, false);
       },
       '!define' => function ($value, $tag, $flags) use ($self)
       {
@@ -154,17 +155,19 @@ class Parser
     ]);
   }
 
-  protected function includeFile ($value, $setNoPath)
+  protected function includeFile ($file, $confdir, $setNoPath)
   {
-#    error_log("RIML::includeFile(\"$value\", ".($setNoPath?'true':'false').')');
-    if (strpos($value, '/') === false && isset($this->confdir))
-    {
-      $file = $this->confdir . '/' . $value;
+#    error_log("RIML::includeFile(\"$file\", ".($setNoPath?'true':'false').')');
+    if (!isset($confdir))
+    { // No specific confdir passed for the current context, check for global.
+      $confdir = $this->confdir;
     }
-    else
-    {
-      $file = $value;
+
+    if (isset($confdir) && substr($file, 0, 1) !== '/')
+    { // The filename is relative to the current confdir.
+      $file = $confdir . '/' . $file;
     }
+
     if (isset($this->included[$file]))
     {
       if ($this->included[$file])

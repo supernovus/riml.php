@@ -13,10 +13,12 @@ trait RouteInfo
    * Controller name.
    */
   public $controller;
+
   /**
    * Handler method name.
    */
   public $method;
+
   /**
    * API type
    *
@@ -27,6 +29,7 @@ trait RouteInfo
    *  true    Uses Content-Type header to determine format.
    */
   public $apiType;
+
   /**
    * Authentication type
    *
@@ -67,11 +70,21 @@ trait RouteInfo
     }
   }
 
+  /**
+   * Return our child routes.
+   *
+   * @return array  An array of Route objects.
+   */
   public function getRoutes ()
   {
     return $this->routes;
   }
 
+  /**
+   * Check to see if this route has child routes.
+   *
+   * @return boolean
+   */
   public function hasRoutes ()
   {
     return (count($this->routes) > 0);
