@@ -38,6 +38,20 @@ class Parser
   public $method_prefix = 'handle_';
   public $confdir;
 
+  /**
+   * HTTP methods that can be used as virtual properties.
+   */
+  public $http_props =
+  [
+    'GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'HEAD', 'POKE', 
+    'OPTIONS', 'CLEAN', 'UNDELETE',
+  ];
+
+  /**
+   * API types that can be used as virtual properties.
+   */
+  public $api_props = ['json','xml'];
+
   protected $traits = []; // Traits for later use.
 
   protected $included = []; // A list of files we've included.

@@ -38,22 +38,6 @@ class Route
   ];
 
   /**
-   * Allowed HTTP methods as virtual properties.
-   */
-  const HTTP_PROPS =
-  [
-    'GET', 'PUT', 'POST', 'DELETE', 'PATCH', 'HEAD', 'POKE', 'OPTIONS',
-  ];
-  
-  /**
-   * Allowed API types as virtual properties.
-   */
-  const API_PROPS =
-  [
-    'json', 'xml',
-  ];
-
-  /**
    * The internal identifier.
    */
   public $route_name;
@@ -179,7 +163,7 @@ class Route
     {
       $this->path = $rname;
     }
-    foreach (self::HTTP_PROPS as $hname)
+    foreach ($this->root->http_props as $hname)
     {
       if (isset($rdef[$hname]))
       {
@@ -190,7 +174,7 @@ class Route
           $rdef[$hname]['path'] = false; // Force parent path use.
       }
     }
-    foreach (self::API_PROPS as $aname)
+    foreach ($this->root->api_props as $aname)
     {
       if (isset($rdef[$aname]))
       {
