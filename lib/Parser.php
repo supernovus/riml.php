@@ -20,7 +20,7 @@ class Parser
   /**
    * The RIML version.
    */
-  const VERSION = '1.0-DRAFT-11';
+  const VERSION = '1.12.0';
 
   /**
    * The namespace RIML child classes are defined in.
@@ -35,7 +35,34 @@ class Parser
     'title', 'description', 'controller', 'method', 'apiType', 'authType',
   ];
 
-  public $method_prefix = 'handle_';
+  /**
+   * Special options only handled by the top-level document.
+   */
+  const TOP_LVL_OPTS =
+  [
+    'methodPrefix' => 'method_prefix',
+    'methodSuffix' => 'method_suffix',
+    'methodReplace' => 'method_replace',
+    'methodCamelCase' => 'method_camel',
+    'controllerPrefix' => 'controller_prefix',
+    'controllerSuffix' => 'controller_suffix',
+    'controllerCamelCase' => 'controller_camel',
+    'controllerReplace' => 'controller_replace',
+  ];
+
+  // Option for allowing multiple inclusion.
+  const INC_POLY = '.includePoly';
+
+  public $method_prefix  = 'handle_';
+  public $method_suffix  = '';
+  public $method_replace = '_';
+  public $method_camel   = false;
+
+  public $controller_prefix  = '';
+  public $controller_suffix  = '';
+  public $controller_replace = '_';
+  public $controller_camel   = false;
+
   public $confdir;
 
   /**
@@ -70,10 +97,10 @@ class Parser
       {
         $this->confdir = $source['dir'];
       }
-      if (isset($source['prefix']))
-      {
-        $this->method_prefix = $source['prefix'];
-      }
+
+      // Check for options passed in the constructor.
+      $this->setOpts($source, '');
+
 
       if (isset($source['file']))
       { // The filename was explicitly passed.
@@ -96,7 +123,12 @@ class Parser
     {
       throw new \Exception("Invalid data passed to RIML() constructor.");
     }
-    $this->root   = $this;
+
+    $this->root = $this; // Meta-reference.
+
+    // Check for options in the top-level document.
+    $this->setOpts($source, '.');
+
     foreach (self::COMMON_PROPS as $pname)
     {
       if (isset($source[$pname]))
@@ -105,7 +137,20 @@ class Parser
         unset($source[$pname]);
       }
     }
+
     $this->addRoutes($source);
+  }
+
+  protected function setOpts($source, $pf)
+  {
+    foreach (self::TOP_LVL_OPTS as $opt => $prop)
+    {
+      $key = $pf.$opt;
+      if (isset($source[$key]))
+      {
+        $this->$prop = $source[$key];
+      }
+    }
   }
 
   protected function loadFile ($filename)
@@ -147,16 +192,30 @@ class Parser
       },
       '!controller' => function ($value, $tag, $flags)
       {
-        if (!is_array($value))
-          $value = [];
-        $value['.controller'] = true;
+        if (is_string($value))
+        { 
+          $value = ['controller'=>$value];
+        }
+        else
+        {
+          if (!is_array($value))
+            $value = [];
+          $value['.controller'] = true;
+        }
         return $value;
       },
       '!method' => function ($value, $tag, $flags)
       {
-        if (!is_array($value))
-          $value = [];
-        $value['.method'] = true;
+        if (is_string($value))
+        {
+          $value = ['method'=>$value];
+        }
+        else
+        {
+          if (!is_array($value))
+            $value = [];
+          $value['.method'] = true;
+        }
         return $value;
       },
       '!virtual' => function ($value, $tag, $flags)
@@ -189,6 +248,7 @@ class Parser
       elseif (isset($this->sources[$file]))
         return $this->sources[$file];
     }
+
     $yaml = $this->loadFile($file);
     $mark = true;
     if (isset($yaml) && is_array($yaml))
@@ -197,7 +257,8 @@ class Parser
         $yaml['virtual'] = true;
       if ($setNoPath && !isset($yaml['noPath']))
         $yaml['noPath'] = true;
-      if (isset($yaml['.includePoly']) && $yaml['.includePoly'])
+      $ip = self::INC_POLY;
+      if (isset($yaml[$ip]) && $yaml[$ip])
       {
         $mark = false;
         $this->sources[$file] = $yaml;

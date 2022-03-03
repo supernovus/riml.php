@@ -150,19 +150,21 @@ class Route
         }
       }
     }
+
     if (isset($rdef['.controller']) && $rdef['.controller'] && !isset($this->controller))
     {
-      $this->controller = $rname;
+      $this->controller = $this->autoName($rname, 'controller');
     }
     elseif (isset($rdef['.method']) && $rdef['.method'] && !isset($this->method))
     {
-      $mname = str_replace('/', '', $rname);
-      $this->method = $this->root->method_prefix.$mname;
+      $this->method = $this->autoName($rname, 'method');
     }
+
     if (!isset($this->path) && !$this->noPath)
     {
       $this->path = $rname;
     }
+
     foreach ($this->root->http_props as $hname)
     {
       if (isset($rdef[$hname]))
@@ -185,7 +187,45 @@ class Route
           $rdef[$aname]['path'] = false;
       }
     }
+
     $this->addRoutes($rdef);
+  }
+
+  protected function autoName($rname, $prop)
+  {
+    $root = $this->root;
+
+    $o = function($what) use ($prop, $root)
+    {
+      $key = "{$prop}_{$what}";
+      return $root->$key;
+    };
+
+    $pf = $o('prefix');
+    $sf = $o('suffix');
+    $rep = $o('replace');
+    $camel = $o('camel');
+
+    $aname = trim($rname, '/');
+    $aname = preg_replace("/\W+/", $rep, $aname);
+    $aname = $pf . $aname . $sf;
+    $aname = $camel ? $this->camelCase($aname, $rep) : strtolower($aname);
+
+    return $aname;
+  }
+
+  public static function camelCase($name, $sep='_', $notFirst=true)
+  {
+    $parts = explode($sep, $name);
+    $cc = '';
+    foreach ($parts as $p => $part)
+    {
+      if ($p == 0)
+        $cc .= strtolower($part);
+      else
+        $cc .= ucfirst(strtolower($part));
+    }
+    return $cc;
   }
 
 }
