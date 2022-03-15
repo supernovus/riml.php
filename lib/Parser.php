@@ -192,7 +192,7 @@ class Parser
       },
       '!controller' => function ($value, $tag, $flags)
       {
-        if (is_string($value))
+        if (is_string($value) && trim($value) != '')
         { 
           $value = ['controller'=>$value];
         }
@@ -206,7 +206,7 @@ class Parser
       },
       '!method' => function ($value, $tag, $flags)
       {
-        if (is_string($value))
+        if (is_string($value) && trim($value) != '')
         {
           $value = ['method'=>$value];
         }
