@@ -8,13 +8,14 @@ configuration files for applications.
 
 It's similar to RAML in some ways, but vastly different in others.
 
-## Specification
+This package provides the official PHP implementation.
 
-The official specification can be found [here](https://github.com/supernovus/riml-spec).
+## Links
 
-## Other implementations
-
-There is a Javascript implementation [here](https://github.com/supernovus/riml.js).
+- [RIML Specification](https://github.com/supernovus/riml-spec)
+- [JS Implementation](https://github.com/supernovus/riml.js)
+- [lum-router-riml](https://github.com/supernovus/lum.router-riml.php)
+  → Compiles RIML files into a lum-router config file.
 
 ## Official URLs
 
@@ -30,3 +31,4 @@ Timothy Totten <2010@totten.ca>
 ## License
 
 [MIT](https://spdx.org/licenses/MIT.html)
+
